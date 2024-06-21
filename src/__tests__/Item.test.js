@@ -4,7 +4,9 @@ import Item from "../components/Item";
 
 function isClassComponent(component) {
   return (
-    typeof component === "function" && !!component.prototype.isReactComponent
+    typeof component === "function" && 
+    !!component.prototype &&
+    !!component.prototype.isReactComponent
   );
 }
 
@@ -13,13 +15,15 @@ test("uses a class component", () => {
 });
 
 test("the <li> does not have a className when initialized", () => {
-  const { container } = render(<Item name="Milk" category="Dairy" />);
-  expect(container.querySelector("li")).toBeInTheDocument();
-  expect(container.querySelector("li").className).not.toContain("in-cart");
+  render(<Item name="Milk" category="Dairy" />);
+  const listItem = screen.getByText("Milk");
+  expect(listItem).toBeInTheDocument();
+  expect(listItem.parentElement).not.toHaveClass("in-cart");
 });
 
 test("the <li> has a className of 'in-cart' when the Add to Cart button is clicked", () => {
-  const { container } = render(<Item name="Milk" category="Dairy" />);
-  fireEvent.click(screen.getByText(/ Cart/));
-  expect(container.querySelector(".in-cart")).toBeInTheDocument();
+  render(<Item name="Milk" category="Dairy" />);
+  fireEvent.click(screen.getByText("Add to Cart"));
+  const listItem = screen.getByText("Milk");
+  expect(listItem.parentElement).toHaveClass("in-cart");
 });
